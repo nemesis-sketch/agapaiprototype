@@ -313,8 +313,8 @@ const mo=[[/bleed|blood|dugo/,'bleeding'],[/burn|paso|exhaust/,'burns'],[/cut|wo
 sc=[[/street|road|kalsada|crash|moto/,'street'],[/school|class|campus/,'school'],[/office|work|factory|site/,'work'],[/park|trail|farm|beach|hike/,'outdoor'],[/home|kitchen|house|room/,'home']].find(x=>x[0].test(s));
 return{mod:mo?mo[1]:DET[h%DET.length],scene:sc?sc[1]:SCN[h%SCN.length]}}
 const fmt=t=>new Date(t).toLocaleString({en:'en-PH',tl:'fil-PH',ceb:'fil-PH'}[S.lang],{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-const S={v:'map',lang:'en',terms:1,pw:0,user:null,tab:'in',f:{},prev:'onb',perm:{cam:1,mic:1,loc:1,gal:1,sms:1},env:'open',read:1,net:'2g',bat:78,slide:0,msgs:[],chat:false,modal:'',an:false,
-ev:{img:'',mod:'bleeding',scene:'home'},aud:{rec:0,done:1,dur:5,text:'“Deep cut on the hand from a box cutter. The bleeding is slowing.”'},i:0,fin:0,cur:SEED[1],voice:false,mod:'cpr',sub:0,open:null,hist:(()=>{try{return JSON.parse(localStorage.getItem('agap-hist')||'[]')}catch(e){return[]}})(),
+const S={v:'splash',lang:'en',terms:0,pw:0,user:null,tab:'in',f:{},prev:'onb',perm:{cam:1,mic:1,loc:1,gal:1,sms:1},env:'open',read:0,net:'2g',bat:78,slide:0,msgs:[],chat:false,modal:'',an:false,
+ev:{img:'',mod:'bleeding',scene:'home'},aud:{rec:0,done:0,dur:0,text:''},i:0,fin:0,cur:null,voice:false,mod:'cpr',sub:0,open:null,hist:(()=>{try{return JSON.parse(localStorage.getItem('agap-hist')||'[]')}catch(e){return[]}})(),
 dark:(()=>{try{const v=localStorage.getItem('agap-dark');return v===null?matchMedia('(prefers-color-scheme: dark)').matches:v=='1'}catch(e){return false}})()};
 const save=()=>{try{localStorage.setItem('agap-hist',JSON.stringify(S.hist))}catch(e){}};
 const TIERS=[['GPS / GNSS','Exact','±8 m'],['Fused Location Provider','Exact','±35 m'],['Network (Cell-ID / Wi-Fi)','Approximate','±800 m'],['Last-known location','Last Known','cached 14 min ago']];
@@ -418,116 +418,8 @@ return `<div class="p-5 pb-44 space-y-4"><div class="flex items-center justify-b
 <div class="card border border-[#91C4D9]/40 p-5 space-y-1"><h2 class="font-extrabold mb-1">${u.setApp}</h2><button data-act="dk" role="switch" aria-checked="${S.dark}" class="w-full flex items-center justify-between gap-4 py-2.5 active:scale-[.98] transition"><span class="text-left"><b class="block">${u.darkT}</b><span class="block text-xs text-slate-500 font-semibold">${u.darkD}</span></span>${tg(S.dark)}</button></div></div>`}};
 
 let lv,rc,ri,rr;
-const FSTEPS=[
-  {l:'1. Photo',v:'home'},
-  {l:'2. Audio',v:'cap'},
-  {l:'Bleeding 1/6',v:'tri',i:0},
-  {l:'Bleeding 2/6',v:'tri',i:1},
-  {l:'Bleeding 3/6',v:'tri',i:2},
-  {l:'Bleeding 4/6',v:'tri',i:3},
-  {l:'Bleeding 5/6',v:'tri',i:4},
-  {l:'Bleeding 6/6',v:'tri',i:5},
-  {l:'9. Handover',v:'tri',fin:1}
-];
-const BOARD_ROWS=[
-  {title:'Row A — Onboarding & Access (4 Frames)',frames:[
-    {id:'01_Splash',name:'Splash Screen',v:'splash',ui:['AgapAI Heart-in-Hands Logo (144×144)','App Title & Tagline: "Close Help, Safer Care"','Offline Edge-AI Readiness Spinner'],links:[['After delay (1600ms) / Tap','02_Onboarding','onb']]},
-    {id:'02_Onboarding',name:'Onboarding & Language',v:'onb',ui:['Top Language Pill: English | Tagalog | Cebuano','3-Slide Carousel ("Your Emergency Copilot")','Primary CTA: "Get Started"','Secondary CTA: "Learn More"'],links:[['Click "Get Started"','03_Auth_Terms','auth'],['Click "Learn More"','Scope & Safety','learn']]},
-    {id:'03_Auth_Terms',name:'Auth & DOH/PRC Scope',v:'auth',ui:['Back Button ‹ + Language Pill Switcher','Log In / Sign Up Segmented Toggle','Mandatory Terms & Liability Checkbox','Buttons: "Log In" & "Continue as Guest"'],links:[['Click "Log In" / "Guest"','04_Permissions','perm'],['Click "‹ Back"','02_Onboarding','onb']]},
-    {id:'04_Permissions',name:'Offline Permissions',v:'perm',ui:['5 Permission Cards: Camera, Mic, Location, Gallery, SMS','Primary CTA: "Allow Permissions"','Text CTA: "Continue in limited offline mode"'],links:[['Click "Allow Permissions"','05_Home_Hub','home']]}
-  ]},
-  {title:'Row B — Core Hub, Camera Scan & Evidence (3 Frames)',frames:[
-    {id:'05_Home_Hub',name:'Home Emergency Hub (EN/TL/CEB)',v:'home',ui:['Status Bar (2G / 78%) + Brand Header + Language Switcher','3-Phase Bar: 1 Photo → 2 Audio capture → 3 Steps','Giant Gold CTA: "Scan Emergency" + "Upload from Gallery"','Gold Banner: "Call 911 Emergency ›" + Bottom 4-Tab Nav'],links:[['Click "Scan Emergency"','07_Evidence_And_Audio','cap'],['Click "First Aid" Tab','15_First_Aid_Library','aid'],['Click "History" Tab','16_Incident_History','hist']]},
-    {id:'06_Camera_Scan',name:'Camera Viewfinder',v:'cap',ui:['Top Bar: ‹ Close | Offline Vision Active | ⚡ Flash','Viewfinder Reticle + Scanning Line','Bottom Bar: Gallery | Capture Shutter | Flip Camera'],links:[['Click "Shutter / Capture"','07_Evidence_And_Audio','cap'],['Click "‹ Close"','05_Home_Hub','home']]},
-    {id:'07_Evidence_And_Audio',name:'Evidence Analyzed & 5s Audio',v:'cap',ui:['Photo Preview + Gold "MATCH FOUND" Badge','Card 1: "Severe Bleeding" + Injury & Setting Chips (Home, Street…)','Card 2: Round Blue "Hold to Record" Mic Button (0:05)','Primary CTA: "See result & steps ›"'],links:[['Click "See result & steps ›"','08_Step_1_of_6_Safety','fstep:2'],['Click "‹ Back"','05_Home_Hub','home']]}
-  ]},
-  {title:'Row C — Guided First-Aid Action Plan: Severe Bleeding (6 Frames)',frames:[
-    {id:'08_Step_1_of_6_Safety',name:'Bleeding Step 1/6 (17%)',v:'tri',fstep:2,ui:['Compact Result Banner: RESULT • Bleeding • Home','Progress Bar (17%) + "Check the scene is safe. Wear gloves…"','Button: "No supplies? Substitutes for Home"','Voice Guide Toggle ("Read steps aloud: On/Off") + ‹ Prev / Next ›'],links:[['Click "Next ›"','09_Step_2_of_6_Call911','fstep:3'],['Click "Substitutes"','OV_Substitutes_Modal','subs']]},
-    {id:'09_Step_2_of_6_Call911',name:'Bleeding Step 2/6 (33%)',v:'tri',fstep:3,ui:['Progress Bar (33%)','Instruction: "Call 911, or ask someone nearby to call."','Substitutes Button + Hands-Free Voice Toggle','Bottom Bar: ‹ Previous | Next › | 📞 Call 911'],links:[['Click "Next ›"','10_Step_3_of_6_DirectPressure','fstep:4'],['Click "‹ Previous"','08_Step_1_of_6_Safety','fstep:2']]},
-    {id:'10_Step_3_of_6_DirectPressure',name:'Bleeding Step 3/6 (50%)',v:'tri',fstep:4,ui:['Progress Bar (50%)','Instruction: "Press firmly on the wound with a clean cloth…"','Substitutes Button: Clean towel, cotton shirt, malong','Bottom Bar: ‹ Previous | Next › | 📞 Call 911'],links:[['Click "Next ›"','11_Step_4_of_6_AddCloth','fstep:5'],['Click "‹ Previous"','09_Step_2_of_6_Call911','fstep:3']]},
-    {id:'11_Step_4_of_6_AddCloth',name:'Bleeding Step 4/6 (67%)',v:'tri',fstep:5,ui:['Progress Bar (67%)','Instruction: "If blood soaks through, add more cloth on top. Don’t lift."','Warning Note: Avoid removing blood-soaked cloth','Bottom Bar: ‹ Previous | Next › | 📞 Call 911'],links:[['Click "Next ›"','12_Step_5_of_6_Elevate','fstep:6'],['Click "‹ Previous"','10_Step_3_of_6_DirectPressure','fstep:4']]},
-    {id:'12_Step_5_of_6_Elevate',name:'Bleeding Step 5/6 (83%)',v:'tri',fstep:6,ui:['Progress Bar (83%)','Instruction: "Lay the person down and raise the injured limb if you can."','Voice Guide Toggle + Substitutes Button','Bottom Bar: ‹ Previous | Next › | 📞 Call 911'],links:[['Click "Next ›"','13_Step_6_of_6_Bandage','fstep:7'],['Click "‹ Previous"','11_Step_4_of_6_AddCloth','fstep:5']]},
-    {id:'13_Step_6_of_6_Bandage',name:'Bleeding Step 6/6 (100%)',v:'tri',fstep:7,ui:['Progress Bar (100%)','Instruction: "Wrap firmly with a bandage and stay until help arrives."','Substitutes: Cloth strips, scarf, necktie or belt','Bottom Bar: ‹ Previous | Finish | 📞 Call 911'],links:[['Click "Finish"','14_Emergency_Handover','fstep:8'],['Click "‹ Previous"','12_Step_5_of_6_Elevate','fstep:6']]}
-  ]},
-  {title:'Row D — Emergency Handover & Secondary Tabs (3 Frames)',frames:[
-    {id:'14_Emergency_Handover',name:'Emergency Handover & Telemetry',v:'tri',fstep:8,ui:['Incident Report Card: Category, Status, 5s Audio, GPS (±8m Exact)','EMS / SMS Telemetry Card + JSON Payload Preview','Buttons: "Transmit telemetry" (Blue) & "Send SMS dispatch" (Gold)','Footer: "↑ Back to first step" & "Return to homepage"'],links:[['Click "Return to homepage"','05_Home_Hub','home'],['Click "↑ Back to first step"','08_Step_1_of_6_Safety','fstep:2']]},
-    {id:'15_First_Aid_Library',name:'First Aid Modules Library',v:'aid',ui:['Offline Directory: CPR, Bleeding, Tambutso Burns, Choking, Splints, Bites','Dialect-Aware Module Cards + Bottom 4-Tab Nav'],links:[['Click Module Card','Module Detail Guide','mod'],['Click "Home" Tab','05_Home_Hub','home']]},
-    {id:'16_Incident_History',name:'Saved Incident History',v:'hist',ui:['Timestamped Log of Completed Stabilizations & Telemetry Status','Tap any incident to reopen Handover & SMS Dispatch'],links:[['Click Incident Row','14_Emergency_Handover','hdet'],['Click "Home" Tab','05_Home_Hub','home']]}
-  ]},
-  {title:'Row E — Modal Overlays (3 Bottom Sheets)',frames:[
-    {id:'OV_Substitutes_Modal',name:'Household Substitutes Sheet',v:'home',ui:['Context-Matched Improvised Supplies (Home / Street / School / Work / Outdoors)','Pressure Pad: Clean towel / shirt • Bandage: Scarf / belt • Splint: Rolled magazine'],links:[['Click "Open Overlay Preview"','OV_Substitutes_Modal','subs']]},
-    {id:'OV_Call_911_Confirm',name:'Call 911 Dispatch Sheet',v:'home',ui:['Emergency Voice Dispatch Confirmation','Full-Width Gold Button: "📞 Call 911" + "Close"'],links:[['Click "Open 911 Modal"','OV_Call_911_Confirm','call']]},
-    {id:'OV_Copilot_Chat',name:'AgapAI Copilot Drawer',v:'home',ui:['Taglish / Bislish / English Q&A Chips','Voice Mic Input + Direct "Scan emergency ›" Shortcut'],links:[['Click "Open Copilot Drawer"','OV_Copilot_Chat','chat']]}
-  ]}
-];
-V.map=function(){
-  return `<div class="p-4 pb-16 space-y-5">
-    <div class="card border border-[#0B7ABF]/30 bg-gradient-to-br from-[#CEECF2] to-white p-5 space-y-2">
-      <div class="flex items-center justify-between gap-2 flex-wrap">
-        <span class="bg-[#0B7ABF] text-white text-xs font-extrabold px-3 py-1 rounded-full">UX/UI PROTOTYPE BLUEPRINT • 16 FRAMES + 3 OVERLAYS</span>
-        <button data-act="fstep" data-k="0" class="${Y} px-4 py-1.5 text-xs">Open Interactive Phone ›</button>
-      </div>
-      <h1 class="text-2xl font-extrabold text-[#0F172A]">AgapAI Clickable Prototype Map</h1>
-      <p class="text-xs font-bold text-slate-600 leading-relaxed">Tap any frame card or interaction button below to jump directly to that live screen in the prototype. Supports English, Tagalog, and Cebuano.</p>
-    </div>
-    ${BOARD_ROWS.map(row=>`<div class="space-y-2.5">
-      <h2 class="text-sm font-extrabold uppercase tracking-wider text-[#0B7ABF] px-1">${row.title}</h2>
-      <div class="space-y-3">${row.frames.map(fr=>`<div class="card border border-[#91C4D9]/50 p-4 space-y-2.5">
-        <div class="flex items-center justify-between gap-2">
-          <div>
-            <span class="inline-block bg-[#CEECF2] text-[#0B7ABF] font-mono text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">${fr.id}</span>
-            <h3 class="text-base font-extrabold text-[#0F172A] mt-1">${fr.name}</h3>
-          </div>
-          <button data-act="${fr.fstep!=null?'fstep':'go'}" data-k="${fr.fstep??''}" data-v="${fr.v}" class="px-3 py-1.5 rounded-full bg-[#0B7ABF] text-white text-xs font-extrabold shrink-0 active:scale-95 transition">Preview Screen ›</button>
-        </div>
-        <div class="bg-[#F4FBFE] border border-[#91C4D9]/30 rounded-2xl p-3 space-y-1">
-          <p class="text-[10px] font-extrabold text-[#0B7ABF] uppercase">UI Elements &amp; Buttons on Screen</p>
-          <ul class="text-xs font-semibold text-slate-700 space-y-1">${fr.ui.map(u=>`<li class="flex gap-1.5"><span class="text-[#0B7ABF] font-extrabold">•</span><span>${u}</span></li>`).join('')}</ul>
-        </div>
-        <div class="space-y-1">
-          <p class="text-[10px] font-extrabold text-slate-500 uppercase">Interaction Map (On Click → Target Frame)</p>
-          <div class="flex flex-wrap gap-1.5">${fr.links.map(([trig,dest,act])=>{
-            const isFs=act.startsWith('fstep:');
-            const fsK=isFs?act.split(':')[1]:'';
-            const actName=isFs?'fstep':(['subs','call','chat'].includes(act)?act:'go');
-            return `<button data-act="${actName}" ${isFs?`data-k="${fsK}"`:`data-v="${act}"`} class="text-left px-3 py-1.5 rounded-xl bg-[#CEECF2]/70 hover:bg-[#CEECF2] text-[#0F172A] text-[11px] font-bold transition flex items-center gap-1.5"><span>${trig}</span><span class="text-[#0B7ABF] font-extrabold">→ ${dest}</span></button>`;
-          }).join('')}</div>
-        </div>
-      </div>`).join('')}</div>
-    </div>`).join('')}
-  </div>`;
-};
-function curFIdx(){
-  if(S.v=='home')return 0;
-  if(S.v=='cap')return 1;
-  if(S.v=='tri'&&S.fin)return 8;
-  if(S.v=='tri')return Math.min(7,Math.max(2,2+S.i));
-  return -1;
-}
-function goFStep(k){
-  const st=FSTEPS[k];if(!st)return;
-  S.ev.mod='bleeding';if(!S.ev.scene)S.ev.scene='home';
-  if(!S.cur)S.cur=SEED[1];
-  S.an=false;S.v=st.v;S.fin=st.fin?1:0;
-  if(st.i!=null)S.i=st.i;
-  render();scrollTo(0,0);
-}
-function flowBar(){
-  const idx=curFIdx();
-  return `<div class="sticky top-8 z-30 bg-white/95 backdrop-blur border-b border-[#91C4D9]/40 px-3 py-2 space-y-1.5">
-    <div class="flex items-center justify-between gap-1.5 text-[11px] font-extrabold text-[#0B7ABF]">
-      <button data-act="go" data-v="${S.v=='map'?'home':'map'}" class="px-2.5 py-1 rounded-full ${S.v=='map'?'bg-[#F2B705] text-[#0F172A]':'bg-[#0F172A] text-white'} transition">${S.v=='map'?'📱 Phone View':'🗺️ 16-Frame Map'}</button>
-      <div class="flex items-center gap-1">
-        <button data-act="go" data-v="onb" class="px-2 py-0.5 rounded-full bg-[#CEECF2] text-[#0F172A] hover:brightness-95 transition">Onboard</button>
-        <button data-act="fprev" ${idx<=0?'disabled':''} class="px-2 py-0.5 rounded-full bg-[#CEECF2] text-[#0B7ABF] disabled:opacity-40">‹ Prev</button>
-        <button data-act="fnext" class="px-2 py-0.5 rounded-full bg-[#0B7ABF] text-white">${idx==FSTEPS.length-1?'Restart':'Next ›'}</button>
-      </div>
-    </div>
-    <div class="flex gap-1.5 overflow-x-auto pb-0.5">${FSTEPS.map((s,k)=>`<button data-act="fstep" data-k="${k}" class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold transition ${idx==k&&S.v!='map'?'bg-[#0B7ABF] text-white shadow-sm':'bg-[#CEECF2]/70 text-[#0F172A]'}">${s.l}</button>`).join('')}</div>
-  </div>`;
-}
 function render(){document.documentElement.classList.toggle('dark',S.dark);document.documentElement.lang={en:'en',tl:'fil',ceb:'ceb'}[S.lang];const nv=['home','aid','mod','hist','hdet','set'].includes(S.v),vc=lv!==S.v?'view':'';lv=S.v;
-app.innerHTML=`${['splash','onb','learn','auth','forgot','perm'].includes(S.v)?'':sbar()}${flowBar()}<div class="${vc}">${V[S.v]()}</div>${nv?nav():''}${nv||(S.v=='tri'&&!S.fin)?fab():''}${S.chat?drawer():''}${S.modal?`<div data-act="bg" class="fixed inset-0 z-50 bg-slate-900/40 flex items-end justify-center"><div class="card rounded-b-none w-full max-w-md p-6 space-y-3">${S.modal}<button data-act="close" class="${W} w-full py-3 border border-[#91C4D9]">${T('close')}</button></div></div>`:''}`;
+app.innerHTML=`${['splash','onb','learn','auth','forgot','perm'].includes(S.v)?'':sbar()}<div class="${vc}">${V[S.v]()}</div>${nv?nav():''}${nv||(S.v=='tri'&&!S.fin)?fab():''}${S.chat?drawer():''}${S.modal?`<div data-act="bg" class="fixed inset-0 z-50 bg-slate-900/40 flex items-end justify-center"><div class="card rounded-b-none w-full max-w-md p-6 space-y-3">${S.modal}<button data-act="close" class="${W} w-full py-3 border border-[#91C4D9]">${T('close')}</button></div></div>`:''}`;
 const m=$('msgs');if(m)m.scrollTop=m.scrollHeight}
 function begin(f,src){S.ev={img:src,...detect(f)};if(S.hint){S.ev.mod=S.hint;S.hint=null}S.aud={rec:0,done:0,dur:0,text:''};S.cur=null;S.fin=0;S.i=0;S.v='cap';S.an=true;S.chat=false;render();setTimeout(()=>{S.an=false;if(S.v=='cap')render()},1600)}
 function pick(f){if(!f)return;const r=new FileReader();r.onload=()=>begin(f,r.result);r.readAsDataURL(f)}
@@ -565,7 +457,6 @@ chip(){reply(d.q)},send(){const i=$('q');if(i.value.trim()){reply(i.value.trim()
 mic(){if(!S.perm.mic){toast(T('tMic'));return}S.listen=!S.listen;render();if(S.listen)setTimeout(()=>{S.listen=false;reply(T('demoQ'))},1800)},
 chat(){S.chat=true;render()},closechat(){S.chat=false;render()},bgc(){S.chat=false;render()},
 net(){S.net=({lte:'2g','2g':'off',off:'lte'})[S.net];if(S.net!='off'){S.hist.forEach(x=>{if(x.tx=='queued')x.tx='sent'});save()}render()},env(){S.env=d.v;render()},tg(){S.perm[d.k]=S.perm[d.k]?0:1;render()},
-fstep(){goFStep(+d.k)},fprev(){const k=curFIdx();if(k>0)goFStep(k-1)},fnext(){const k=curFIdx();goFStep(k<0||k>=FSTEPS.length-1?0:k+1)},
 close(){S.modal='';render()},bg(){S.modal='';render()}})[a]()});
 document.addEventListener('scroll',e=>{const b=e.target;if(b&&b.id=='tcbox'&&!S.read&&b.scrollTop+b.clientHeight>=b.scrollHeight-8){S.read=1;const c=$('tc');if(c){c.disabled=false;c.classList.remove('opacity-40')}const h=$('th');if(h)h.textContent=''}},true);
 document.addEventListener('change',e=>{if(e.target.id=='fc'||e.target.id=='fg')pick(e.target.files[0])});
